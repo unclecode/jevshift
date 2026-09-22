@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0-alpha.2: prepared, unreleased
+## 0.1.0-alpha.2: public preview
 
 - Raise the evaluator transfer ceiling from 1.25 to 5 seconds, with 2-second connection, 5.5-second process and 6-second selection-wait bounds. Slow checkpoints can now wait longer; no retries were added.
 - Show the last evaluator outcome and elapsed time in `/jevshift status`.
@@ -14,4 +14,4 @@
 - Bounded curl transport, stale-decision rejection and fail-safe model behavior.
 - MIT license, installation/configuration/privacy/compatibility documentation, synthetic payload and exact public-file packaging.
 
-Known limits: unresolved prompt-quality gate, repeated live evaluator deadline misses, low-effort-only overrides, experimental Claude Function Hooks, and same-native-default reselection not releasing a pin in the tested SDK path. No demonstrated routing or quota-saving advantage. Public release remains a maintainer decision; a fresh install from the public GitHub URL remains to be checked.
+Known limits: unresolved prompt-quality gate, repeated live evaluator deadline misses, low-effort-only overrides, experimental Claude Function Hooks, and same-native-default reselection not releasing a pin in the tested SDK path. No demonstrated routing or quota-saving advantage. A fresh install from the public GitHub URL passed in an isolated profile, including six native command checks. Public users still need their own Claude login and an OpenRouter key for Jev recommendations.

@@ -27,7 +27,7 @@ This is a reviewed public summary of a private lab conducted 20–22 September 2
 
 ## Release posture
 
-The package starts in observe; auto requires explicit configuration and a command. A general auto-mode release needs new frozen prompt-quality validation and a measured resolution of evaluator latency. The current candidate may be evaluated as an experimental preview, with these limits visible. The private GitHub repository has been created. A fresh install from its public URL remains a release check.
+The package starts in observe; auto requires explicit configuration and a command. A general auto-mode release needs new frozen prompt-quality validation and a measured resolution of evaluator latency. The public repository is an experimental preview with these limits visible. The documented terminal install path passed from the public GitHub URL in an isolated profile.
 
 ## Alpha.1 package preparation: 22 September 2026
 
@@ -51,4 +51,8 @@ The updated native fault suite passed 43 scenario checks across 19 cleanly exite
 
 The maintainer supplied status output showing an observe-mode Fable recommendation with native Opus retained (2,253 ms), then an auto-mode Fable recommendation with Fable requested and returned (2,665 ms). The maintainer also reported the expected Opus implementation and Sonnet documentation transitions, Sonnet pin hold during planning, and native manual selection releasing the plugin to off. The latter checks are user reports, not a new independently audited trace or benchmark.
 
-Personal acceptance is complete. The repository was created privately for README and package review. Public visibility, release and launch remain subject to the maintainer's decision. Personal acceptance does not close the prompt-quality gate above.
+Personal acceptance is complete. The repository was created privately for README and package review, then the maintainer made it public. Personal acceptance does not close the prompt-quality gate above.
+
+## Public GitHub installation: 22 September 2026
+
+The documented terminal path added `unclecode/jevshift` as a marketplace and installed `jevshift@jevshift` version 0.1.0-alpha.2 in a disposable Claude Code profile. The native session initialized, and status, setup, gated auto, pin, off and observe all passed. Uninstall and marketplace removal passed. A second isolated run disabled SSH and saved Git settings; Claude Code retried the public repository over HTTPS and the same checks passed. Both runs used a synthetic Claude credential and closed loopback inference endpoint, with zero paid model calls. The in-session one-line install shortcut and real sensitive-key configuration UI were not exercised in this public test.
