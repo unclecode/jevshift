@@ -1,12 +1,12 @@
 # Changelog
 
-## 0.1.0-alpha.2 — prepared, unreleased
+## 0.1.0-alpha.2: prepared, unreleased
 
 - Raise the evaluator transfer ceiling from 1.25 to 5 seconds, with 2-second connection, 5.5-second process and 6-second selection-wait bounds. Slow checkpoints can now wait longer; no retries were added.
 - Show the last evaluator outcome and elapsed time in `/jevshift status`.
 - Keep native fallback, stale-reply rejection and the unchanged selection prompt. Six bounded synthetic live checks passed. The maintainer subsequently confirmed the personal observe/auto/pin/manual-control checks; broader quality sign-off remains open.
 
-## 0.1.0-alpha.1 — prepared, unreleased
+## 0.1.0-alpha.1: prepared, unreleased
 
 - Jev recommendations from bounded Markdown/XML context; observe is the new-session default.
 - Per-session status, setup, pin, off and explicitly gated auto controls.

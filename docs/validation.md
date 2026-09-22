@@ -29,7 +29,7 @@ This is a reviewed public summary of a private lab conducted 20–22 September 2
 
 The package starts in observe; auto requires explicit configuration and a command. A general auto-mode release needs new frozen prompt-quality validation and a measured resolution of evaluator latency. The current candidate may be evaluated as an experimental preview, with these limits visible. Publication and a fresh install from the published GitHub repository remain a separate release step.
 
-## Alpha.1 package preparation — 22 September 2026
+## Alpha.1 package preparation: 22 September 2026
 
 Both plugin and marketplace manifests passed native Claude validation. The source suite passed 80 tests / 348 assertions; four additional Python packaging tests checked exclusion of unlisted/private files, repeatable ZIP output, overwrite refusal, external symlink/path rejection, defaults and missing dependencies. The synthetic request matched the current collector and evaluator prompt.
 
@@ -37,7 +37,7 @@ An extracted allowlisted package installed through a local marketplace in a disp
 
 Two harness corrections were retained privately: a static test sentinel matched its own source text, and the first native probe incorrectly treated Claude's zero-token synthetic slash-command reply as inference. Corrected probes passed without changing production source. Runtime, prompt and existing unit tests are unchanged in this packaging step. GitHub publication/remote install and secure-configuration UI verification remain pending.
 
-## Alpha.2 — personal-test timeout correction
+## Alpha.2: personal-test timeout correction
 
 The first personal observe-mode test timed out and kept native Opus. Its screenshot/transcript did not include a precise evaluator duration. Alpha.1's transfer cap was 1.25 seconds; alpha.2 changes the nested bounds to 2 seconds for connection, 5 seconds for transfer, 5.5 seconds for the host process and 6 seconds for the outer selection wait. The trade-off is a longer possible delay at evaluation checkpoints. No retries were added and the evaluator prompt is unchanged.
 
@@ -47,7 +47,7 @@ The runtime suite passes 82 tests / 359 assertions, including a response after t
 
 The updated native fault suite passed 43 scenario checks across 19 cleanly exited processes with simulated providers, including eight-second stalled headers/body, interruption, concurrency, unavailable models and recovery. In the two stalled-response cases, transport timed out around five seconds and the next prompt reached inference 27 ms / 22 ms later. All earlier failure evidence remains unchanged. These results verify the bounded cleanup path, not live-provider availability.
 
-## Personal acceptance and private review — 22 September 2026
+## Personal acceptance and private review: 22 September 2026
 
 The maintainer supplied status output showing an observe-mode Fable recommendation with native Opus retained (2,253 ms), then an auto-mode Fable recommendation with Fable requested and returned (2,665 ms). The maintainer also reported the expected Opus implementation and Sonnet documentation transitions, Sonnet pin hold during planning, and native manual selection releasing the plugin to off. The latter checks are user reports, not a new independently audited trace or benchmark.
 
