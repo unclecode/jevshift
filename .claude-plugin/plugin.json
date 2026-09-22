@@ -1,0 +1,45 @@
+{
+  "name": "jevshift",
+  "version": "0.1.0-alpha.2",
+  "description": "Experimental Jev-assisted model selection for Claude Code: observe, pin, off, and opt-in auto.",
+  "keywords": [
+    "claude-code",
+    "model-selection",
+    "evaluation",
+    "jev"
+  ],
+  "userConfig": {
+    "openrouter_api_key": {
+      "type": "string",
+      "title": "OpenRouter API key",
+      "description": "Observe and auto send bounded, best-effort redacted conversation excerpts to OpenRouter / TypeSafe Jev. Claude Code manages sensitive storage; leave blank to use pin/off without Jev.",
+      "sensitive": true,
+      "required": false
+    },
+    "use_environment_key": {
+      "type": "boolean",
+      "title": "Use OPENROUTER_API_KEY environment variable",
+      "description": "Explicitly allow reading the inherited environment key when no sensitive plugin key is configured. Sends the same context to OpenRouter / TypeSafe Jev.",
+      "default": false,
+      "required": false
+    },
+    "experimental_auto": {
+      "type": "boolean",
+      "title": "Enable experimental auto control",
+      "description": "Allow /jevshift auto for isolated alpha testing. Selection quality and broad live evaluator reliability remain under evaluation; new sessions still start observe.",
+      "default": false,
+      "required": false
+    },
+    "claude_executable": {
+      "type": "string",
+      "title": "Claude executable for model discovery",
+      "description": "Claude executable on PATH, or its absolute path. Runs a bounded no-prompt SDK initialization in safe mode.",
+      "default": "claude",
+      "required": false
+    }
+  },
+  "license": "MIT",
+  "author": {
+    "name": "JevShift contributors"
+  }
+}

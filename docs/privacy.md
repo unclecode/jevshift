@@ -1,0 +1,27 @@
+# Privacy and evaluator cost
+
+## Data flow
+
+Claude's native conversation → bounded visible-context collector → one Jev choice request → validated recommendation → optional request-level model override.
+
+Observe and auto send context to `https://openrouter.ai/api/alpha/decisions`, serving TypeSafe Jev. A native Claude login authenticates Claude inference separately. JevShift neither reads Claude OAuth files nor changes account tokens, and is not an account router.
+
+The collector includes the current instruction (up to 1,600 UTF-8 bytes), six recent visible messages (350 bytes each), a nearby visible plan/work excerpt (1,100 bytes), and up to three tool-result excerpts (650 bytes each). Whole state and serialized-state limits are 7,000 bytes; the full evaluator JSON is capped at 9,000 bytes. Limits can omit context and affect decisions. The XML-delimited state is evidence, not additional instructions to Claude.
+
+Known credentials, secret assignments, email addresses and home-path patterns are masked. Hidden thinking is excluded. **Unknown secrets, proprietary code and other sensitive content can still appear.** Only enable evaluation for material you are willing to send to those providers. The plugin does not change their retention or training policies.
+
+Pin/off send no new Jev calls. Switching away invalidates an outstanding decision; it cannot retract content already sent. Missing credentials or native nonessential-traffic opt-out prevent new evaluator transport.
+
+## Local storage and diagnostics
+
+The plugin persists session ID, mode, pin and blocked state through Claude's plugin store. It does not persist collected conversation excerpts or evaluator request bodies. Native Claude transcripts/debug logs are separately managed by Claude. Plugin diagnostics contain decision metadata, timing, model IDs and available usage; raw error bodies and keys are excluded. Inspect any logs before sharing them.
+
+Use Claude's sensitive plugin option for a key, or explicitly permit an already-inherited environment key. Claude owns secure storage and may fall back to a credential file. The evaluator credential/body pass to curl through stdin, not shell arguments. The transport disables default curl configuration, redirects and retries. curl's usual environment/network behavior can still apply.
+
+## Billing and limits
+
+OpenRouter bills Jev separately from the Claude subscription. The alpha uses a maximum of three evaluator checkpoints per instruction in auto, one outstanding evaluation per session, and bounded request/output sizes. It has **no global session/day spending cap**. Missing/timeout usage means unknown billing, not zero. Consult provider pricing before use; historical experiment costs are not a price guarantee.
+
+No calibrated mapping from API token/cost estimates to Claude weekly subscription quotas is established. The plugin neither measures nor balances subscription quotas. [Validation](validation.md) separates mechanics from savings/quality claims.
+
+The checked-in [request example](../examples/jev-request.json) is fully synthetic. No private transcript, real key or native account profile is included.

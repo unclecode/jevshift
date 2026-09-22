@@ -1,0 +1,10 @@
+{
+  "pluginConfigs": {
+    "jevshift": {
+      "options": {
+        "use_environment_key": true,
+        "experimental_auto": false
+      }
+    }
+  }
+}

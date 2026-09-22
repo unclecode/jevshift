@@ -1,0 +1,17 @@
+{
+  "name": "jevshift",
+  "version": "0.1.0-alpha.2",
+  "private": true,
+  "description": "Experimental Jev-assisted model selection for Claude Code: observe, pin, off, and opt-in auto.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "bun test ./tests",
+    "check:package": "python3 scripts/package.py --check",
+    "package": "python3 scripts/package.py --output dist",
+    "example": "bun scripts/example.ts"
+  },
+  "engines": {
+    "bun": ">=1.3.1"
+  }
+}
