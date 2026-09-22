@@ -27,7 +27,7 @@ This is a reviewed public summary of a private lab conducted 20–22 September 2
 
 ## Release posture
 
-The package starts in observe; auto requires explicit configuration and a command. A general auto-mode release needs new frozen prompt-quality validation and a measured resolution of evaluator latency. The current candidate may be evaluated as an experimental preview, with these limits visible. Publication and a fresh install from the published GitHub repository remain a separate release step.
+The package starts in observe; auto requires explicit configuration and a command. A general auto-mode release needs new frozen prompt-quality validation and a measured resolution of evaluator latency. The current candidate may be evaluated as an experimental preview, with these limits visible. The private GitHub repository has been created. A fresh install from its public URL remains a release check.
 
 ## Alpha.1 package preparation: 22 September 2026
 
@@ -35,7 +35,7 @@ Both plugin and marketplace manifests passed native Claude validation. The sourc
 
 An extracted allowlisted package installed through a local marketplace in a disposable profile. Six native command checks passed (status, setup, gated auto, pin, off, observe), followed by uninstall and marketplace removal. A separate session loaded the shipped local auto-settings example and passed the same six checks with auto explicitly enabled. Both processes exited normally. Credentials were synthetic, the inference endpoint was an unreachable loopback address, evaluator transport was disabled, and only local commands were submitted. These checks prove loading/control configuration, not model inference or real secure-key storage.
 
-Two harness corrections were retained privately: a static test sentinel matched its own source text, and the first native probe incorrectly treated Claude's zero-token synthetic slash-command reply as inference. Corrected probes passed without changing production source. Runtime, prompt and existing unit tests are unchanged in this packaging step. GitHub publication/remote install and secure-configuration UI verification remain pending.
+Two harness corrections were retained privately: a static test sentinel matched its own source text, and the first native probe incorrectly treated Claude's zero-token synthetic slash-command reply as inference. Corrected probes passed without changing production source. Runtime, prompt and existing unit tests are unchanged in this packaging step. At the time of this package test, GitHub publication, remote installation and secure-configuration UI verification were pending.
 
 ## Alpha.2: personal-test timeout correction
 
@@ -51,4 +51,4 @@ The updated native fault suite passed 43 scenario checks across 19 cleanly exite
 
 The maintainer supplied status output showing an observe-mode Fable recommendation with native Opus retained (2,253 ms), then an auto-mode Fable recommendation with Fable requested and returned (2,665 ms). The maintainer also reported the expected Opus implementation and Sonnet documentation transitions, Sonnet pin hold during planning, and native manual selection releasing the plugin to off. The latter checks are user reports, not a new independently audited trace or benchmark.
 
-Personal acceptance is complete. The next authorized step is a **private** GitHub repository for README/package review. Public visibility, release and launch remain subject to the maintainer's later approval. Personal acceptance does not close the prompt-quality gate above.
+Personal acceptance is complete. The repository was created privately for README and package review. Public visibility, release and launch remain subject to the maintainer's decision. Personal acceptance does not close the prompt-quality gate above.

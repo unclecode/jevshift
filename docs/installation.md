@@ -8,8 +8,6 @@ The tested setup is macOS with Claude Code **2.1.278**, experimental Function Ho
 
 Jev recommendations need an [OpenRouter key](https://openrouter.ai/keys). Pin and off work without one. There is no npm install or build step. Other Claude versions and platforms have not been validated.
 
-While the repository is private, your GitHub credentials must grant access to it. A repository-not-found error can mean that Git cannot authenticate. Check your normal GitHub login first.
-
 ## Install inside Claude Code
 
 Paste this into a Claude Code terminal session:

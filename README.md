@@ -20,7 +20,7 @@ These are preferences, not guaranteed choices. New sessions start in **observe**
 
 ## Quick install
 
-Choose either method. While this repository is private, your GitHub login must have access to it.
+Choose either method.
 
 ### Inside Claude Code
 
