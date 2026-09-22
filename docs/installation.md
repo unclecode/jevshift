@@ -16,7 +16,7 @@ Paste this into a Claude Code terminal session:
 /plugin install jevshift --marketplace unclecode/jevshift
 ```
 
-Confirm the marketplace source and choose **User** for all your projects. This shortcut requires Claude Code 2.1.275 or later and is present in the tested 2.1.278 CLI.
+Confirm the marketplace source and choose **User** for all your projects. Claude Code may initially select Project scope. This shortcut requires Claude Code 2.1.275 or later and is present in the tested 2.1.278 CLI.
 
 You can also add and install separately. Run each command in order:
 

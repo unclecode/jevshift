@@ -30,7 +30,7 @@ Paste this into a Claude Code terminal session:
 /plugin install jevshift --marketplace unclecode/jevshift
 ```
 
-Confirm the source and choose **User** to make the plugin available across your projects.
+Confirm the source and choose **User** to make the plugin available across your projects. Claude Code may initially select Project scope.
 
 ### From your terminal
 
