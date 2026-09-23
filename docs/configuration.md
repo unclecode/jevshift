@@ -1,6 +1,18 @@
 # Configuration
 
-New sessions start **observe**. A missing evaluator key leaves Claude's native requests unchanged and shows a setup notice. Manual pins and off do not need OpenRouter. `/jevshift setup` discovers the native model catalog and supported effort levels; it does not collect or store an API key, and it resets the session to observe. Catalog presence does not guarantee account access or quota.
+New sessions start **observe** and resolve the native model aliases. A missing evaluator key leaves Claude's native requests unchanged and shows a setup notice. Manual pins and off do not need OpenRouter. `/jevshift refresh` refreshes discovery while preserving controls; `/jevshift setup` refreshes and resets to observe. Neither collects or stores an API key. Catalog presence does not guarantee account access or quota.
+
+## Model versions
+
+JevShift asks the installed Claude executable to resolve `sonnet`, `opus` and `fable`, then checks the resulting versions against its supported-model catalog. It does not select whichever version appears first or has the largest number. Resolution follows that Claude installation's provider and model configuration, which can intentionally point to an older version. Keep Claude Code updated to follow its recommended releases.
+
+The mapping is cached for the current process. New processes discover again at startup, including resumed sessions. Use `/jevshift refresh` to discover again without leaving auto or losing a pin. No background polling or automatic CLI update runs. If discovery fails completely, refresh leaves the existing mapping and controls unchanged; unavailable families are omitted when other families resolve successfully.
+
+- `/jevshift pin opus` pins the family. After refresh or restart it uses the newly resolved Opus version.
+- `/jevshift pin claude-opus-5-5` pins that exact ID, if discovery validates it. It stays fixed across refresh and resume. If the version disappears from discovery, the pin blocks rather than switching silently.
+- Pins saved by alpha.3 and earlier already contain exact IDs. They stay exact; re-pin using a family name to follow new versions.
+
+`/jevshift status` shows the resolved versions. An updated version does not automatically change Jev's task-selection policy. Adding a family such as Haiku or changing the planning/implementation preferences still requires a reviewed policy update.
 
 ## Add an evaluator key
 

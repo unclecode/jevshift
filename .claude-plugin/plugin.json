@@ -1,6 +1,6 @@
 {
   "name": "jevshift",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "Experimental Jev-assisted model and effort selection for Claude Code: observe, pin, off, and opt-in auto.",
   "keywords": [
     "claude-code",
@@ -33,7 +33,7 @@
     "claude_executable": {
       "type": "string",
       "title": "Claude executable for model discovery",
-      "description": "Claude executable on PATH, or its absolute path. Runs a bounded no-prompt SDK initialization in safe mode.",
+      "description": "Claude executable on PATH, or its absolute path. Runs bounded no-inference SDK helpers in safe mode to resolve family aliases.",
       "default": "claude",
       "required": false
     },

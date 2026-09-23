@@ -2,8 +2,9 @@ import type { Boundary, ModelSelection } from './context-hooks.ts';
 import type { ContextSnapshot } from './context.ts';
 import { ObserveSession, type ObserveHost, type Observation } from './observe.ts';
 import type { Tier,DecisionScope } from './jev.ts';
+import {contextTarget} from './catalog.ts';
 
-export type Target = {model:string; efforts:readonly string[]};
+export type Target = {model:string; efforts:readonly string[]; versions?:readonly Target[]};
 /** Supplied by the host after native capability discovery; no inferred account entitlement. */
 export type Catalog = Partial<Record<Tier,Target>>;
 export type RoutingEvent = {event:'routing';sessionId:string;turnId:string;step:number;generation:number;
@@ -25,7 +26,7 @@ export class AutoSession {
   stop():void {this.enabled=false;this.invalidate();}
   private show(host:ObserveHost,text:string):void {if(this.notice===text)return;this.notice=text;try{host.show(text)}catch{}}
   private supported(tier:Tier,id:Boundary,effort:Boundary['effort']):Picked|undefined {
-    const target=this.catalog[tier];
+    const offered=this.catalog[tier],target=offered&&contextTarget(offered,id.nativeModel);
     if (!target || !/^claude-[a-z0-9-]+(?:\[1m\])?$/.test(target.model)) return;
     // A catalog entry is capability evidence, never a quota/entitlement bypass.
     if (effort !== undefined && (typeof effort!=='string' || !target.efforts.includes(effort))) return;

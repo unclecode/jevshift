@@ -1,7 +1,6 @@
 import {effortAnswer} from './helpers/decision.ts';
 import {test,expect} from 'bun:test';
 import {SessionControls} from '../src/controls.ts';
-import {parseCatalog} from '../src/catalog.ts';
 const catalog={sonnet:{model:'claude-sonnet-5',efforts:['low']},opus:{model:'claude-opus-5[1m]',efforts:['low']},fable:{model:'claude-fable-5-1',efforts:['low']}};
 const id={sessionId:'a',turnId:'turn',step:0,nativeModel:'claude-sonnet-5',effort:'low'} as any;
 const snapshot={state:'<current_request>Design a system.</current_request>',meta:{ready:true,generation:1,instructionId:1}} as any;
@@ -15,7 +14,7 @@ test('pin/off never call evaluator; invalid inputs preserve accepted pin',async(
  const t=setup();await t.c.bind('a','startup',t.host);expect(t.c.mode).toBe('observe');
  await t.c.command('pin opus',id.nativeModel);expect((await t.c.guard(id))?.model).toBe(catalog.opus.model);
  for(const cmd of ['pin unknown','pin claude-fable-does-not-exist','off extra','pin opus extra'])await t.c.command(cmd,id.nativeModel);
- expect(t.c.pin).toBe(catalog.opus.model);await t.c.select(snapshot,id,t.evaluator);expect(t.calls()).toBe(0);
+ expect(t.c.pin).toBe('opus');await t.c.select(snapshot,id,t.evaluator);expect(t.calls()).toBe(0);
  await t.c.command('off',id.nativeModel);expect((await t.c.select(snapshot,id,t.evaluator))?.model).toBe(id.nativeModel);expect(t.calls()).toBe(0);
 });
 test('same-ID resume restores pin; other IDs, clear and fork default observe',async()=>{
@@ -60,10 +59,6 @@ test('status distinguishes all four models and old failure cannot stop a new pin
 test('slow discovery cannot undo off; persistence failure is visible',async()=>{
  const t=setup();let release:any;t.host.discover=()=>new Promise(r=>release=r);await t.c.bind('a','startup',t.host);const pin=t.c.command('pin opus',id.nativeModel);
  await Promise.resolve();await t.c.command('off',id.nativeModel);release(catalog);await pin;expect(t.c.mode).toBe('off');t.host.set=async()=>{throw Error('disk')};await t.c.command('observe',id.nativeModel);expect(t.c.status()).toContain('could not be saved');
-});
-test('catalog admits only discovered Claude tiers at verified effort, never account data',()=>{
- const r={type:'control_response',response:{subtype:'success',request_id:'jevshift-catalog',response:{account:{email:'not retained'},models:[{resolvedModel:catalog.opus.model,supportedEffortLevels:['low','max']},{resolvedModel:catalog.sonnet.model,supportedEffortLevels:['low']},{resolvedModel:catalog.fable.model,supportedEffortLevels:['high']}]}}};
- expect(parseCatalog(JSON.stringify(r))).toEqual({opus:{...catalog.opus,efforts:['low','max']},sonnet:catalog.sonnet,fable:{...catalog.fable,efforts:['high']}});for(const s of ['{}','bad',JSON.stringify({...r,response:{...r.response,subtype:'error'}})])expect(()=>parseCatalog(s)).toThrow();
 });
 test('old response cannot overwrite new session status or trigger a cross-session evaluation',async()=>{
  const t=setup();await t.c.bind('a','startup',t.host);await t.c.command('pin opus',id.nativeModel);const selection=await t.c.guard(id);

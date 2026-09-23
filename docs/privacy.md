@@ -14,7 +14,7 @@ Off, model-only pins with native effort, and fully fixed model/effort pins send 
 
 ## Local storage and diagnostics
 
-The plugin persists session ID, mode, model/effort controls and blocked state through Claude's plugin store. It does not persist collected conversation excerpts or evaluator request bodies. Native Claude transcripts/debug logs are separately managed by Claude. Plugin diagnostics contain decision metadata, timing, model IDs, efforts and available usage; raw error bodies and keys are excluded. Inspect any logs before sharing them.
+The plugin persists session ID, mode, model/effort controls and blocked state through Claude's plugin store. Model pins retain either a family alias or an exact ID. Startup/refresh helpers read native catalog and applied-model settings; only validated model IDs and efforts are retained in memory. Account details and unrelated settings from helper responses are discarded. It does not persist collected conversation excerpts or evaluator request bodies. Native Claude transcripts/debug logs are separately managed by Claude. Plugin diagnostics contain decision metadata, timing, model IDs, efforts and available usage; raw error bodies and keys are excluded. Inspect any logs before sharing them.
 
 Use Claude's sensitive plugin option for a key, or explicitly permit an already-inherited environment key. Claude owns secure storage and may fall back to a credential file. The evaluator credential/body pass to curl through stdin, not shell arguments. The transport disables default curl configuration, redirects and retries. curl's usual environment/network behavior can still apply.
 

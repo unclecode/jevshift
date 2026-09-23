@@ -50,6 +50,7 @@
 !/src/context.ts
 !/src/controls-hooks.ts
 !/src/controls.ts
+!/src/discovery.ts
 !/src/effort.ts
 !/src/evaluator-limits.ts
 !/src/jev-prompt.ts
@@ -60,6 +61,7 @@
 !/src/transport.ts
 !/tests/auto-hooks.test.ts
 !/tests/auto.test.ts
+!/tests/catalog.test.ts
 !/tests/context-hooks.test.ts
 !/tests/context-session.test.ts
 !/tests/context.test.ts

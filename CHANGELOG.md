@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.4: follow native model aliases
+
+- Resolve each model family through Claude Code's applied model, instead of selecting the first matching catalog row. Verify support and omit disabled/unresolved families.
+- Discover at startup and add `/jevshift refresh`, preserving mode, pins and effort settings. Show resolved versions in status.
+- Family pins follow the resolved version after refresh or restart. Exact and existing saved version pins stay fixed, and block if no longer discoverable.
+- Retain discovered older versions for explicit pins only. Model-selection and effort prompts are unchanged.
+
 ## 0.1.0-alpha.3: model and thinking effort
 
 - Ask Jev for model and effort in one bounded request. Apply only a complete, supported pair.

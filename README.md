@@ -18,6 +18,8 @@ Effort is chosen separately: **low** for routine work, **medium** for bounded pr
 
 These are preferences, not guaranteed choices. New sessions start in **observe** mode: you see recommendations while Claude keeps its current model and effort. Turn on **auto** when you're ready, or pin either choice yourself.
 
+Model versions follow Claude Code's `sonnet`, `opus` and `fable` aliases. Keep Claude Code updated; JevShift resolves them at startup. Use `/jevshift refresh` to check again in an existing session. An exact model-ID pin stays on that version.
+
 **Experimental alpha.** Tested on macOS with Claude Code **2.1.280**. Requires curl **8.4+**, your Claude login and model access. Jev recommendations use a separate [OpenRouter API key](https://openrouter.ai/keys). No build or npm install is needed.
 
 ## Quick install
@@ -86,9 +88,10 @@ Try planning a small feature, implementing the agreed plan, then updating its do
 |---|---|
 | `/jevshift status` | Show recommendations, timing, requested effort and requested/returned model. |
 | `/jevshift setup` | Discover models and return to observe mode. |
+| `/jevshift refresh` | Refresh model versions while preserving your mode and pins. |
 | `/jevshift observe` | Recommend model and effort without applying them. |
 | `/jevshift auto` | Choose both automatically when auto is enabled in settings. |
-| `/jevshift pin sonnet` | Hold Sonnet with native effort. No Jev calls. Also accepts `opus`, `fable` or a discovered model ID. |
+| `/jevshift pin sonnet` | Hold the Sonnet family with native effort; its version follows discovery. No Jev calls. Also accepts `opus`, `fable` or an exact discovered model ID. |
 | `/jevshift pin opus high` | Hold both model and effort. No Jev calls. |
 | `/jevshift effort medium` | Fix effort while keeping the current model policy. In observe, this stays advisory. |
 | `/jevshift effort auto` | Let Jev choose effort, including with a pinned model. Requires auto enabled to apply changes. |

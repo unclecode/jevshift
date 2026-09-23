@@ -1,7 +1,7 @@
 import type {Register} from 'claude-code';
 import {SessionControls} from './controls.ts';
 import {registerContextHooks} from './context-hooks.ts';
-import {CATALOG_ARGS,CATALOG_INPUT,parseCatalog} from './catalog.ts';
+import {discoverCatalog} from './discovery.ts';
 import type {Catalog,RoutingEvent} from './auto.ts';
 import type {Observation} from './observe.ts';
 import {isEffort} from './effort.ts';
@@ -13,16 +13,11 @@ export function registerControlHooks(on:Parameters<Register>[0],options:Paramete
   let discover:(()=>Promise<Catalog>)|undefined;
   // No prompt is submitted. Safe mode prevents this helper loading this plugin again.
   on('session.start',async($,e,next)=>{
-    discover=async()=>{
-      const result=await $.process.run([typeof options.claude_executable==='string'&&options.claude_executable.trim()?options.claude_executable:'claude',...CATALOG_ARGS],{
-        stdin:CATALOG_INPUT,timeoutMs:8000,
-        env:{CLAUDECODE:'',CLAUDE_CODE_ENABLE_FUNCTION_HOOKS:'0',CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC:'1'},
-      });
-      if(result.exitCode!==0)throw Error('Catalog process failed');
-      return parseCatalog(result.stdout);
-    };
+    discover=()=>discoverCatalog((argv,init)=>$.process.run(argv,init),
+      typeof options.claude_executable==='string'&&options.claude_executable.trim()?options.claude_executable:'claude');
     await controls.bind(await $.session.id(),'startup',{get:key=>$.store.get(key),set:(key,value)=>$.store.set(key,value),discover:()=>discover!()});
-    await $.command.register({name:'jevshift',description:'Control Jev model and effort selection for this session',argumentHint:'status|setup|observe|auto|off|pin <model> [effort]|effort <level|auto|native>',immediate:true});
+    await controls.warmCatalog();
+    await $.command.register({name:'jevshift',description:'Control Jev model and effort selection for this session',argumentHint:'status|setup|refresh|observe|auto|off|pin <model> [effort]|effort <level|auto|native>',immediate:true});
     return next(e);
   });
   on('command.run',async($,e,next)=>{

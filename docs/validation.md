@@ -2,6 +2,16 @@
 
 This is a reviewed public summary of private labs conducted 20–23 September 2026. Raw user transcripts, account profiles, run logs and internal working reports are excluded from publication. Synthetic unit tests and one synthetic request example are included. Historical evidence is not a reproducible public benchmark without the private inputs.
 
+## Alpha.4: native alias discovery, 23 September 2026
+
+The source suite passed **106 tests / 494 assertions**, including shuffled catalogs, conflicting/default rows, missing aliases, disabled entries, exact older pins, family updates, resume, failed/stale refresh and 1M-context preservation. Four Python packaging tests also passed. Neither the model nor effort prompt changed.
+
+Real no-inference SDK probes resolved Sonnet 5, Opus 5.5 and Fable 5.1 through the installed Claude Code **2.1.280** binary. The Fable menu used a concrete ID rather than a `fable` alias row; checking the applied model separately avoided relying on menu spelling or row order.
+
+A native mock-provider workflow passed observe, auto, independently pinned dimensions and invalid-reply fallback using actual alias discovery. A separate installed-plugin session passed 14 native command checks, including startup discovery, refresh preserving a family pin and medium effort, and an exact version pin remaining fixed. Installation and removal used an isolated profile, synthetic credentials, disabled evaluator traffic and a closed local inference endpoint. Version changes across catalog refresh/resume were simulated in unit tests, not by changing Anthropic's live catalog.
+
+These checks establish alias resolution and controls in the tested CLI. They do not validate other providers or future CLI protocols, prove that every recommended model is accessible to every account, or change the existing routing-quality and savings limitations.
+
 ## Alpha.3: model and effort, 23 September 2026
 
 The source suite passed **95 tests / 409 assertions**, with four additional Python packaging tests. Coverage includes independent pins, supported efforts and caps, incomplete replies, stale decisions, native takeover, persistence and reversal handling. Native plugin/hook and marketplace validation passed on Claude Code **2.1.280**.
