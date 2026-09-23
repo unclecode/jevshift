@@ -1,3 +1,4 @@
+import {effortAnswer} from './helpers/decision.ts';
 import {fakeCurl} from './helpers/fake-curl.ts';
 import {test,expect} from 'bun:test';
 import {registerAutoHooks} from '../src/auto-hooks.ts';
@@ -6,7 +7,7 @@ function setup(){
  registerAutoHooks(((n:string,f:Function)=>hooks[n]=f) as any,{openrouter_api_key:'test-key'},
   {fable:{model:'claude-fable-5-1',efforts:['low']}},e=>events.push(e));
  const $={env:{get:async()=>undefined},session:{id:async()=> 'a',messages:async()=>messages},clock:{now:async()=>0,after:()=>({cancel:()=>{}})},ui:{status:()=>{},log:()=>{}},
-  http:{fetch:async()=>{fetches++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}}};
+  http:{fetch:async()=>{fetches++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{effort_choice:effortAnswer('low'),model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}}};
  Object.assign($,{process:{run:fakeCurl($.http.fetch)}});
  return {hooks,messages,$,events,fetches:()=>fetches};
 }

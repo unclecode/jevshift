@@ -1,6 +1,26 @@
 # Validation and unresolved issues
 
-This is a reviewed public summary of a private lab conducted 20–22 September 2026. Raw user transcripts, account profiles, run logs and internal working reports are excluded from publication. Synthetic unit tests and one synthetic request example are included. Historical evidence is not a reproducible public benchmark without the private inputs.
+This is a reviewed public summary of private labs conducted 20–23 September 2026. Raw user transcripts, account profiles, run logs and internal working reports are excluded from publication. Synthetic unit tests and one synthetic request example are included. Historical evidence is not a reproducible public benchmark without the private inputs.
+
+## Alpha.3: model and effort, 23 September 2026
+
+The source suite passed **95 tests / 409 assertions**, with four additional Python packaging tests. Coverage includes independent pins, supported efforts and caps, incomplete replies, stale decisions, native takeover, persistence and reversal handling. Native plugin/hook and marketplace validation passed on Claude Code **2.1.280**.
+
+The frozen effort-v2 policy pilot used 30 fresh synthetic cases, six per effort level. Jev matched **29/30 effort labels**, **27/30 model labels** and **26/30 complete pairs**. Selected efforts were low 7, medium 5, high 6, xhigh 6, max 6. On the original 30 cases, effort agreement improved from 21/30 to 25/30, with two upward regressions retained. Across the 66-call pilot, all replies were structurally valid, five repeated boundary cases were stable, and reported evaluator cost was $0.003985338. These are same-author policy labels, not independent task-quality or optimal-compute measurements. Model-v7 instructions are unchanged.
+
+Native mock runs verified all 15 model/effort combinations, upward/downward changes, native release, observe passthrough, independent questions and invalid-reply fallback. Separate live runs then made **27 real Claude requests**, all returning HTTP 200:
+
+- All five effort levels on Sonnet 5, Opus 5.5 and Fable 5.1, followed by max-to-low switching and native `/effort medium` takeover.
+- Automatic planning with Fable/high, serializer implementation with Opus/low, and documentation with Sonnet/low in one conversation. Read/Write tool calls completed across the model changes. Four functional serializer cases passed eight assertions afterward.
+- Observe retained native Sonnet/low. A pinned Opus model allowed Jev to select only effort; fixed medium effort allowed Jev to select only the model.
+
+Seven live Jev decisions completed in **468–895 ms**, with $0.000507276 reported evaluator cost and no unknown billing in this sample. Claude Code reported $1.0774718 in API-equivalent cost across the 27 requests; that is not a measurement of subscription quota or the amount charged to an account. No credentials were logged or included in the package.
+
+The serializer's initial effort choice was low with probabilities low 0.54 / medium 0.46. Its functional checks passed, but this remains a policy boundary, not proof that low is always sufficient for implementation. The documentation task wrote two explanatory lines plus a heading, so it was not an exact two-line file. Those observations are retained rather than treated as perfect task compliance.
+
+The live checks verified outgoing effort fields and returned model IDs. They do not establish model internals, cache preservation, quota savings or better outcomes. Cache reads occurred within some tool loops; misses also occurred after changes. A native test-harness startup race initially stopped before any inference; waiting for asynchronous hook initialization corrected the harness without changing production logic.
+
+An extracted package containing only the 54 allowed public files passed the same 95 tests. In a disposable profile it installed through a local marketplace, passed nine native command checks (including effort pins and disabled-auto behavior), then uninstalled cleanly. These installation checks used synthetic credentials, disabled evaluator traffic and a closed local inference endpoint. Private paths, account labels and credential patterns were checked separately before publication.
 
 ## Established in the tested environment
 

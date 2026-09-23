@@ -1,3 +1,4 @@
+import {effortAnswer} from './helpers/decision.ts';
 import {test,expect} from 'bun:test';
 import {AutoSession,type Catalog} from '../src/auto.ts';
 import {buildContext} from '../src/context.ts';
@@ -8,7 +9,7 @@ const catalog:Catalog={sonnet:{model:'claude-sonnet-5',efforts:['low']},opus:{mo
 const snapshot=(generation=1,instructionId=generation)=>buildContext([],{text:'Build the agreed plan.',origin:'sdk',generation,instructionId});
 const outcome=(id:string,error=false,tool='Read')=>({id,error,tool});
 const boundary=(step=0,outcomes:Boundary['outcomes']=[],extra:Partial<Boundary>={}):Boundary=>({sessionId:'a',turnId:'t',step,nativeModel:'claude-sonnet-5',effort:'low',outcomes,...extra});
-const response=(choice:string)=>({status:200,ok:true,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{model_choice:{type:'choice',choice,confidence:1,probabilities:{sonnet:+(choice==='sonnet'),opus:+(choice==='opus'),fable:+(choice==='fable')}}}})});
+const response=(choice:string)=>({status:200,ok:true,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{effort_choice:effortAnswer('low'),model_choice:{type:'choice',choice,confidence:1,probabilities:{sonnet:+(choice==='sonnet'),opus:+(choice==='opus'),fable:+(choice==='fable')}}}})});
 function setup(choices=['fable','opus','fable'],targets=catalog){
  let calls=0;const events:any[]=[],notices:string[]=[],timers:(()=>void)[]=[];
  const host:ObserveHost={now:async()=>0,after:(ms,fn)=>{timers.push(fn);return{cancel:()=>{}}},key:async()=> 'test-key',
@@ -55,7 +56,7 @@ test('same boundary does not reevaluate and old tool results are not new evidenc
 });
 test('unsupported model, effort, numeric effort and shrinking a long-context selection are rejected',async()=>{
  for(const [targets,change] of [[{},{}],[catalog,{effort:'max'}],[catalog,{effort:99}],[catalog,{nativeModel:'claude-sonnet-5[1m]'}]] as any[]){
-  const t=setup(['opus'],targets);expect(await t.auto.select(snapshot(),boundary(0,[],change),t.host)).toBeUndefined();
+  const t=setup(['opus'],targets);expect(await t.auto.select(snapshot(),boundary(0,[],change),t.host,{fixedEffort:'native'})).toBeUndefined();
   expect(t.events.some(e=>e.outcome==='target_not_validated')).toBe(true);
  }
 });

@@ -2,7 +2,8 @@ import {EVALUATOR_LIMITS} from './evaluator-limits.ts';
 import {TransportError,type TransportOutcome} from './transport.ts';
 import type { ContextSnapshot } from './context.ts';
 import type { Boundary } from './context-hooks.ts';
-import { ENDPOINT, parseReply, requestBody, type Reply, type Parsed, type Tier, type Usage } from './jev.ts';
+import { ENDPOINT, parseReply, requestBody, type Reply, type Parsed, type Tier, type Usage,type DecisionScope } from './jev.ts';
+import type {Effort} from './effort.ts';
 
 export type ObserveHost = {
   now: () => Promise<number>;
@@ -14,7 +15,7 @@ export type ObserveHost = {
 export type Observation = {
   event: 'started' | 'finished' | 'late_settlement' | 'skipped';
   sessionId: string; turnId: string; generation: number; step: number; attempt?: number;
-  outcome: string; nativeModel: string; recommendation?: Tier;
+  outcome: string; nativeModel: string; recommendation?: Tier;effortRecommendation?:Effort;
   timestampMs: number; elapsedMs?: number; billing?:'reported'|'unknown'|'not_requested'; usage?: Usage; httpStatus?: number; evaluatorModel?: string;
 };
 const safeModel = (x: string) => typeof x === 'string' && /^[\w./:-]{1,128}$/.test(x) ? x : 'selected model';
@@ -38,7 +39,7 @@ export class ObserveSession {
     try { host.show(text); } catch { /* UI is advisory. */ }
   }
   async consume(snapshot: ContextSnapshot, id: Boundary, host: ObserveHost,
-    options: {checkpoint?:string; quiet?:boolean} = {}): Promise<Observation | undefined> {
+    options: {checkpoint?:string; quiet?:boolean;scope?:DecisionScope} = {}): Promise<Observation | undefined> {
     if (this.session !== id.sessionId) { this.invalidate(); this.session=id.sessionId; this.seen=''; this.lastNotice=''; }
     const key = options.checkpoint ?? String(snapshot.meta.generation);
     if (key === this.seen) return;
@@ -55,7 +56,7 @@ export class ObserveSession {
       this.emit({...base,event:'skipped',outcome:'request_still_pending'});
       if (!options.quiet) this.notice(host,'JevShift · Observe: previous Jev request still pending; selected model unchanged.'); return;
     }
-    const body = requestBody(snapshot.state);
+    const body = requestBody(snapshot.state,options.scope);
     if (!body) { this.emit({...base,event:'skipped',outcome:'payload_too_large'}); return; }
     // Start the deadline before reading credentials. A local deadline does not cancel HTTP.
     let wake: (value: 'timeout' | 'stale' | 'aborted') => void = () => {};
@@ -77,7 +78,7 @@ export class ObserveSession {
         attempt = ++this.serial;
         this.emit({...base,event:'started',outcome:'requested',attempt});
         const reply = await host.fetch(ENDPOINT,{method:'POST',headers:{Authorization:`Bearer ${credential}`,'Content-Type':'application/json'},body});
-        return parseReply(reply);
+        return parseReply(reply,options.scope);
       } catch (error) { return {outcome:error instanceof TransportError?error.outcome:'network_error'}; }
     })();
     const settlement = operation.then(async result => {
@@ -104,12 +105,12 @@ export class ObserveSession {
     const decision = typeof result === 'object' && 'decision' in result ? result.decision : undefined;
     const observation: Observation = {...base,event:'finished',attempt,outcome,elapsedMs,
       billing:typeof result==='object'&&'usage' in result&&result.usage?'reported':attempt&&!(typeof result==='object'&&result.outcome==='transport_disabled')?'unknown':'not_requested',
-      ...(!stale && outcome==='recommended' && decision ? {recommendation:decision.choice,evaluatorModel:decision.model} : {}),
+      ...(!stale && outcome==='recommended' && decision ? {recommendation:decision.choice,effortRecommendation:decision.effort,evaluatorModel:decision.model} : {}),
       ...(typeof result==='object' && 'httpStatus' in result ? {usage:result.usage,httpStatus:result.httpStatus} : {})};
     this.emit(observation);
     if (stale || outcome==='aborted' || outcome==='stale' || options.quiet) return observation;
     if (outcome==='recommended' && decision) {
-      this.notice(host,`JevShift · Observe: recommend ${title(decision.choice)}; keeping ${nativeModel}.`);
+      this.notice(host,`JevShift · Observe: recommend ${title(decision.choice)}${decision.effort?` / ${decision.effort}`:''}; keeping ${nativeModel} / ${id.effort??'default'}.`);
     } else if (outcome==='missing_key') {
       this.notice(host,'JevShift · Observe needs an OpenRouter key. Set the sensitive openrouter_api_key plugin option; selected model unchanged.');
     } else {

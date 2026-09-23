@@ -4,11 +4,12 @@ import {registerContextHooks} from './context-hooks.ts';
 import {CATALOG_ARGS,CATALOG_INPUT,parseCatalog} from './catalog.ts';
 import type {Catalog,RoutingEvent} from './auto.ts';
 import type {Observation} from './observe.ts';
+import {isEffort} from './effort.ts';
 
 export function registerControlHooks(on:Parameters<Register>[0],options:Parameters<Register>[1],
   record:(event:Observation|RoutingEvent)=>void=()=>{}):void {
   let diagnostic:(event:Observation|RoutingEvent)=>void=()=>{};
-  const controls=new SessionControls(options.experimental_auto===true,event=>{record(event);diagnostic(event)});
+  const controls=new SessionControls(options.experimental_auto===true,event=>{record(event);diagnostic(event)},isEffort(options.max_effort)?options.max_effort:'max');
   let discover:(()=>Promise<Catalog>)|undefined;
   // No prompt is submitted. Safe mode prevents this helper loading this plugin again.
   on('session.start',async($,e,next)=>{
@@ -21,13 +22,18 @@ export function registerControlHooks(on:Parameters<Register>[0],options:Paramete
       return parseCatalog(result.stdout);
     };
     await controls.bind(await $.session.id(),'startup',{get:key=>$.store.get(key),set:(key,value)=>$.store.set(key,value),discover:()=>discover!()});
-    await $.command.register({name:'jevshift',description:'Control Jev model selection for this session',argumentHint:'status|setup|observe|auto|off|pin <model>',immediate:true});
+    await $.command.register({name:'jevshift',description:'Control Jev model and effort selection for this session',argumentHint:'status|setup|observe|auto|off|pin <model> [effort]|effort <level|auto|native>',immediate:true});
     return next(e);
   });
-  on('command.run',{command:'jevshift'},async($,e)=>{
+  on('command.run',async($,e,next)=>{
+    if(e.command==='effort'){
+      if(isEffort(e.args.trim())||['auto','ultracode'].includes(e.args.trim()))await controls.nativeEffortCommand();
+      return next(e);
+    }
+    if(e.command!=='jevshift')return next(e);
     await controls.bind(await $.session.id(),'command',{get:key=>$.store.get(key),set:(key,value)=>$.store.set(key,value),discover:()=>discover!()});
     const text=await controls.command(e.args,await $.session.model());
-    $.ui.status(`JevShift · ${controls.mode}${controls.pin?` ${controls.pin}`:''}${controls.blocked?' (blocked)':''}`);
+    $.ui.status(`JevShift · ${controls.mode}${controls.pin?` ${controls.pin}`:''} · effort ${controls.effort}${controls.blocked?' (blocked)':''}`);
     return {text};
   });
   registerContextHooks(on,async(snapshot,id,host)=>{

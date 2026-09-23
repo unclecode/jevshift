@@ -87,7 +87,7 @@ def validate(root):
                 if not path.is_relative_to(root) or path.relative_to(root).as_posix() not in allowed:
                     raise ValueError('Broken public link: ' + name + ' -> ' + target)
     example = load('examples/jev-request.json')
-    if example.get('model') != 'typesafe/jev-1.13' or list(example.get('questions', {})) != ['model_choice'] or not isinstance(example.get('state'), str):
+    if example.get('model') != 'typesafe/jev-1.13' or list(example.get('questions', {})) != ['model_choice', 'effort_choice'] or not isinstance(example.get('state'), str):
         raise ValueError('Unexpected request example')
     # An ignore rule cannot protect a file that is already tracked.
     try:

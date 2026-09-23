@@ -6,7 +6,7 @@ One thing I need every day is intelligent model switching. When I work in Claude
 
 ## How it works
 
-JevShift asks Jev to choose a model using your request, recent conversation, plan and tool results. It can switch models inside the same Claude Code conversation.
+JevShift asks Jev to choose a model and thinking effort using your request, recent conversation, plan and tool results. It can change both inside the same Claude Code conversation.
 
 | Work | Preferred model |
 |---|---|
@@ -14,9 +14,11 @@ JevShift asks Jev to choose a model using your request, recent conversation, pla
 | Implementing an agreed plan and debugging | Opus |
 | Small edits, explanations and documentation | Sonnet |
 
-These are preferences, not guaranteed choices. New sessions start in **observe** mode: you see recommendations while Claude keeps its current model. Turn on **auto** when you're ready, or **pin** a model yourself.
+Effort is chosen separately: **low** for routine work, **medium** for bounded problems, **high** for substantial reasoning, **xhigh** for difficult interactions, and **max** for exceptional analysis. An agreed plan can still need high effort to implement.
 
-**Experimental alpha.** Tested on macOS with Claude Code **2.1.278**. Requires curl **8.4+**, low effort, your Claude login and model access. Jev recommendations use a separate [OpenRouter API key](https://openrouter.ai/keys). No build or npm install is needed.
+These are preferences, not guaranteed choices. New sessions start in **observe** mode: you see recommendations while Claude keeps its current model and effort. Turn on **auto** when you're ready, or pin either choice yourself.
+
+**Experimental alpha.** Tested on macOS with Claude Code **2.1.280**. Requires curl **8.4+**, your Claude login and model access. Jev recommendations use a separate [OpenRouter API key](https://openrouter.ai/keys). No build or npm install is needed.
 
 ## Quick install
 
@@ -54,7 +56,7 @@ Enter your **OpenRouter API key** in the masked field. To try automatic switchin
 CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 claude --effort low
 ```
 
-Use that launch command for JevShift sessions. The restart loads your settings and enables the experimental hooks this alpha needs. You can use pin/off without a Jev key.
+Use that launch command for JevShift sessions. The restart loads your settings and enables the experimental hooks this alpha needs. `--effort low` sets the starting native effort; auto can choose any supported level. Manual pins and off work without a Jev key.
 
 ## Try it
 
@@ -76,26 +78,30 @@ To let JevShift apply its recommendations:
 /jevshift auto
 ```
 
-Try planning a small feature, implementing the agreed plan, then updating its documentation. Use status after each phase to see the actual model used.
+Try planning a small feature, implementing the agreed plan, then updating its documentation. Use status after each phase to see the returned model and requested effort.
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `/jevshift status` | Show mode, recommendation, timing and the requested/returned model. |
+| `/jevshift status` | Show recommendations, timing, requested effort and requested/returned model. |
 | `/jevshift setup` | Discover models and return to observe mode. |
-| `/jevshift observe` | Recommend a model without changing it. |
-| `/jevshift auto` | Apply recommendations when auto is enabled in settings. |
-| `/jevshift pin sonnet` | Hold Sonnet. Also accepts `opus`, `fable` or a discovered model ID. |
+| `/jevshift observe` | Recommend model and effort without applying them. |
+| `/jevshift auto` | Choose both automatically when auto is enabled in settings. |
+| `/jevshift pin sonnet` | Hold Sonnet with native effort. No Jev calls. Also accepts `opus`, `fable` or a discovered model ID. |
+| `/jevshift pin opus high` | Hold both model and effort. No Jev calls. |
+| `/jevshift effort medium` | Fix effort while keeping the current model policy. In observe, this stays advisory. |
+| `/jevshift effort auto` | Let Jev choose effort, including with a pinned model. Requires auto enabled to apply changes. |
+| `/jevshift effort native` | Keep Claude's native effort while retaining the model policy. |
 | `/jevshift off` | Return control to Claude Code. |
 
-Changes apply to the next model request. Each session keeps its own controls. Changing the native model to a different choice turns JevShift off; `/jevshift off` always releases a pin.
+Changes apply to the next model request. Each session keeps its own controls. Changing the native model or effort turns JevShift off; `/jevshift off` always releases both. See [independent pin examples](docs/configuration.md#model-and-effort-control).
 
 ## Privacy and limits
 
-Observe and auto send short conversation, plan and tool excerpts to **OpenRouter / TypeSafe Jev**. Known secret patterns are masked, but private content can still be included. Pin and off make no Jev calls. See [what gets sent](docs/privacy.md) and a [complete synthetic request](examples/jev-request.json).
+Observe, auto and a pinned model with automatic effort send short conversation, plan and tool excerpts to **OpenRouter / TypeSafe Jev**. Known secret patterns are masked, but private content can still be included. Fully manual pins and off make no Jev calls. See [what gets sent](docs/privacy.md) and a [complete synthetic request](examples/jev-request.json).
 
-This is an early preview. Evaluator calls can add delay or time out, and model choices still need broader testing. A timeout keeps the incoming model. We have tested switching and controls, but have not established better task outcomes or quota savings. See [validation](docs/validation.md) and [compatibility](docs/compatibility.md).
+This is an early preview. Evaluator calls can add delay or time out, and choices still need broader testing. A failed evaluation keeps native values for automatic choices and preserves valid manual pins. Effort is a reasoning preference, not a token budget. We have tested switching and controls, but have not established better task outcomes, cache preservation or quota savings. See [validation](docs/validation.md) and [compatibility](docs/compatibility.md).
 
 ## Demo
 

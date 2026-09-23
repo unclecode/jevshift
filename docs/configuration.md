@@ -1,6 +1,6 @@
 # Configuration
 
-New sessions start **observe**. A missing evaluator key leaves Claude's native requests unchanged and shows a setup notice. Pin and off do not need OpenRouter. `/jevshift setup` discovers the account's current native model catalog; it does not collect or store an API key, and it resets the session to observe.
+New sessions start **observe**. A missing evaluator key leaves Claude's native requests unchanged and shows a setup notice. Manual pins and off do not need OpenRouter. `/jevshift setup` discovers the native model catalog and supported effort levels; it does not collect or store an API key, and it resets the session to observe. Catalog presence does not guarantee account access or quota.
 
 ## Add an evaluator key
 
@@ -20,10 +20,11 @@ Avoid passing real keys in command-line `--config` arguments, committed JSON, ch
 |---|---|---|
 | `openrouter_api_key` | Empty | Sensitive OpenRouter credential for observe/auto. |
 | `use_environment_key` | `false` | Permit reading an already-inherited `OPENROUTER_API_KEY` if no plugin key is configured. |
-| `experimental_auto` | `false` | Allow `/jevshift auto`; does not turn auto on for new sessions. |
+| `experimental_auto` | `false` | Allow automatic model/effort control; does not turn auto on for new sessions. |
+| `max_effort` | `max` | Highest effort JevShift may apply: `low`, `medium`, `high`, `xhigh` or `max`. |
 | `claude_executable` | `claude` | Executable on PATH or absolute path used for no-prompt catalog discovery. |
 
-No endpoint, prompt, model-ID, effort-policy or timeout override is exposed in this alpha. Candidate IDs come from the native catalog, restricted to supported Sonnet/Opus/Fable tiers. Jev uses `typesafe/jev-1.13` at the OpenRouter alpha decisions endpoint.
+No endpoint, prompt, model-ID or timeout override is exposed in this alpha. Candidate IDs and supported efforts come from the native catalog, restricted to Sonnet/Opus/Fable tiers. Jev uses `typesafe/jev-1.13` at the OpenRouter alpha decisions endpoint. The effort cap limits plugin overrides, including explicit pins; it does not change native settings or impose a token/spending limit. An automatic choice above the cap is rejected, not silently lowered.
 
 ## Local environment-key testing
 
@@ -37,10 +38,27 @@ The example opts in to environment-key use but leaves auto disabled. Use `exampl
 
 These examples use the local plugin identity `jevshift`. An installed marketplace plugin uses `jevshift@jevshift`; configure that identity through Claude's UI. Project `.claude/settings.json` and `.claude/settings.local.json` are not supported sources for `pluginConfigs`; the local example works through explicit `--settings`.
 
-## Model control
+## Model and effort control
 
-Use `/jevshift pin opus` for a fixed model, `/jevshift observe` for recommendations, and `/jevshift off` for native control. Inspect `/jevshift status` to distinguish the native default from the requested/returned model. An actual native model change switches the plugin off. Same-native-model reselection may leave a pin active; explicit off is the reliable release command in this tested build.
+Run each line in order for the behavior you want:
 
-Only low effort and compatible context windows are admitted. A failed pin stays blocked and reports how to recover. Re-pin to retry deliberately, select a different model, or use off. Auto timeouts keep the incoming native model; a native inference failure stops auto.
+| Goal | Commands |
+|---|---|
+| Automatic model and effort | `/jevshift auto` |
+| Automatic model, fixed high effort | `/jevshift auto`, then `/jevshift effort high` |
+| Fixed Opus, automatic effort | `/jevshift pin opus`, then `/jevshift effort auto` |
+| Fixed Opus and high effort | `/jevshift pin opus high` |
+| Fixed Opus, native effort | `/jevshift pin opus` |
+| Automatic model, native effort | `/jevshift auto`, then `/jevshift effort native` |
+| Only recommendations | `/jevshift observe` |
+| Native control of both | `/jevshift off` |
+
+`auto` resets both choices to automatic. `pin <model>` resets effort to native. An `effort` command preserves the current model policy. In observe it stays advisory; from off it holds the native model and applies the requested effort policy. Automatic effort outside observe requires the experimental-auto option and a Jev key. Jev is asked only about dimensions that are automatic.
+
+Inspect `/jevshift status` to distinguish the native defaults, recommendations, requested effort and returned model. Requested effort does not measure how much thinking the model actually did. A native model change, explicit `/effort <level>` command, or detected native effort change releases JevShift to off. Same-native-model reselection may leave a pin active; explicit off always releases it.
+
+Only discovered effort levels and compatible context windows are admitted. Invalid or incomplete evaluator replies do not apply a partial model/effort change. Evaluator failure preserves compatible explicit pins and uses incoming native values for automatic choices. A failed pin stays blocked and reports how to recover. Re-pin deliberately, choose another pair, or use off. Native inference failure stops auto.
+
+Selections are reconsidered on a new instruction, plan approval, repeated tool failures or sufficient new tool progress, with at most three evaluations per instruction. Routine tool calls reuse the current choice. This avoids a new evaluator call for every tool result while allowing difficult work to trigger a change.
 
 Configuration storage and source precedence follow [Claude's user-configuration reference](https://code.claude.com/docs/en/plugins-reference#user-configuration).

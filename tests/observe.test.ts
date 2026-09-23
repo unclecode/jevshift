@@ -1,3 +1,4 @@
+import {effortAnswer} from './helpers/decision.ts';
 import {test,expect} from 'bun:test';
 import {ObserveSession,type ObserveHost,type Observation} from '../src/observe.ts';
 import {buildContext} from '../src/context.ts';
@@ -5,7 +6,7 @@ import {parseReply,requestBody,ENDPOINT} from '../src/jev.ts';
 import {JEV_PROMPT} from '../src/jev-prompt.ts';
 const snap=(generation=1)=>buildContext([],{text:'Design a new sync architecture.',origin:'sdk',generation});
 const id=(turnId='t',signal?:AbortSignal)=>({sessionId:'a',turnId,step:0,nativeModel:'claude-sonnet-5',signal});
-const reply=(choice='fable')=>({status:200,ok:true,text:JSON.stringify({model:'typesafe/jev-1.13-20260917',answers:{model_choice:{type:'choice',choice,confidence:1,probabilities:{sonnet:choice==='sonnet'?1:0,opus:choice==='opus'?1:0,fable:choice==='fable'?1:0}}},usage:{input_tokens:500,output_tokens:30,cost:.000021}})});
+const reply=(choice='fable')=>({status:200,ok:true,text:JSON.stringify({model:'typesafe/jev-1.13-20260917',answers:{effort_choice:effortAnswer('low'),model_choice:{type:'choice',choice,confidence:1,probabilities:{sonnet:choice==='sonnet'?1:0,opus:choice==='opus'?1:0,fable:choice==='fable'?1:0}}},usage:{input_tokens:500,output_tokens:30,cost:.000021}})});
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve()};
 function setup(){
  let time=0, resolve:(x:ReturnType<typeof reply>)=>void=()=>{},key:string|undefined='synthetic-test-key';
@@ -16,9 +17,9 @@ function setup(){
  const observer=new ObserveSession(e=>events.push(e));
  return{host,observer,events,notices,calls,resolve,missing:()=>{key=undefined},advance:async(ms:number)=>{time+=ms;for(const t of timers)if(t.active&&t.at<=time){t.active=false;t.fn()}await flush()}};
 }
-test('one typed question, no current-model field, bounded full body',()=>{
+test('two typed questions, no current-model field, bounded full body',()=>{
  const body=JSON.parse(requestBody(snap().state!)!);
- expect(body.questions).toEqual(JEV_PROMPT.questions);expect(Object.keys(body.questions)).toEqual(['model_choice']);
+ expect(body.questions).toEqual(JEV_PROMPT.questions);expect(Object.keys(body.questions)).toEqual(['model_choice','effort_choice']);
  expect(body.state).not.toContain('current_model');expect(requestBody('z'.repeat(9000))).toBeNull();
 });
 test('strict parsing keeps billing separately from invalid decisions',()=>{
@@ -37,7 +38,7 @@ test('success shows recommendation and incoming model, deduplicates tool steps',
  await t.observer.consume(snap(),{...id(),step:1},t.host);
  await t.observer.consume(snap(),id('empty-continuation'),t.host);
  expect(t.calls).toHaveLength(1);expect(t.calls[0].url).toBe(ENDPOINT);
- expect(t.notices).toEqual(['JevShift · Observe: recommend Fable; keeping claude-sonnet-5.']);
+ expect(t.notices).toEqual(['JevShift · Observe: recommend Fable / low; keeping claude-sonnet-5 / default.']);
  expect(t.events.at(-1)).toMatchObject({outcome:'recommended',recommendation:'fable',usage:{costUsd:.000021}});
  expect(JSON.stringify(t.events)).not.toContain('Design a new');expect(JSON.stringify(t.events)).not.toContain('synthetic-test-key');
 });
@@ -75,7 +76,7 @@ test('missing key, invalid response and network errors preserve work with no ret
 test('concurrent registrations keep recommendations separate',async()=>{
  const a=setup(),b=setup();const pa=a.observer.consume(snap(),id(),a.host),pb=b.observer.consume(snap(),{...id(),sessionId:'b',nativeModel:'claude-opus-5'},b.host);
  await flush();a.resolve(reply('sonnet'));b.resolve(reply('fable'));await Promise.all([pa,pb]);
- expect(a.notices[0]).toContain('recommend Sonnet; keeping claude-sonnet-5');expect(b.notices[0]).toContain('recommend Fable; keeping claude-opus-5');
+ expect(a.notices[0]).toContain('recommend Sonnet / low; keeping claude-sonnet-5');expect(b.notices[0]).toContain('recommend Fable / low; keeping claude-opus-5');
 });
 test('unavailable context and an already interrupted request make no call',async()=>{
  const t=setup();await t.observer.consume(buildContext([],null),id(),t.host);

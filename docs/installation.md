@@ -4,9 +4,9 @@ Choose an in-session install or a terminal install. They install the same plugin
 
 ## Before you start
 
-The tested setup is macOS with Claude Code **2.1.278**, experimental Function Hooks and curl **8.4+**. Use your normal Claude login. Your account must have access to the models you want to use.
+The tested setup is macOS with Claude Code **2.1.280**, experimental Function Hooks and curl **8.4+**. Use your normal Claude login. Your account must have access to the models you want to use.
 
-Jev recommendations need an [OpenRouter key](https://openrouter.ai/keys). Pin and off work without one. There is no npm install or build step. Other Claude versions and platforms have not been validated.
+Jev recommendations need an [OpenRouter key](https://openrouter.ai/keys). Manual pins and off work without one. There is no npm install or build step. Other Claude versions and platforms have not been validated.
 
 ## Install inside Claude Code
 
@@ -16,7 +16,7 @@ Paste this into a Claude Code terminal session:
 /plugin install jevshift --marketplace unclecode/jevshift
 ```
 
-Confirm the marketplace source and choose **User** for all your projects. Claude Code may initially select Project scope. This shortcut requires Claude Code 2.1.275 or later and is present in the tested 2.1.278 CLI.
+Confirm the marketplace source and choose **User** for all your projects. Claude Code may initially select Project scope. This shortcut requires Claude Code 2.1.275 or later and is present in the tested 2.1.280 CLI.
 
 You can also add and install separately. Run each command in order:
 
@@ -52,9 +52,9 @@ Set **OpenRouter API key** in the masked field. Turn on **Enable experimental au
 CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 claude --effort low
 ```
 
-Use this launch command for sessions that need JevShift. Existing sessions do not acquire a launch environment variable through a plugin install. A restart also loads the saved plugin options.
+Use this launch command for sessions that need JevShift. The low effort flag sets the native starting value; auto can select any supported level. Existing sessions do not acquire a launch environment variable through a plugin install. A restart also loads the saved plugin options.
 
-Run `/jevshift setup`, then send a task. `/jevshift status` shows the recommendation and the model that actually answered. New sessions begin in observe. Use `/jevshift auto` to apply recommendations.
+Run `/jevshift setup`, then send a task. `/jevshift status` shows model/effort recommendations, requested effort and the model that actually answered. New sessions begin in observe. Use `/jevshift auto` to apply recommendations.
 
 For environment keys and advanced settings, see [configuration](configuration.md). Do not put a real key in a command-line `--config` argument or a JSON file committed to Git.
 
@@ -98,4 +98,4 @@ For a temporary pause, use `/jevshift off`. Uninstalling does not guarantee remo
 
 Run `/plugin` and check its Errors tab. Confirm the Claude version, restart with `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`, and avoid safe mode, which disables plugins. See [compatibility](compatibility.md) for model, effort and timeout issues.
 
-Claude's [installation guide](https://code.claude.com/docs/en/discover-plugins) documents marketplace installation and the in-session shortcut. Its [plugin reference](https://code.claude.com/docs/en/plugins-reference#user-configuration) covers options and sensitive storage. The experimental Function Hooks launch requirement was verified against the installed 2.1.278 CLI.
+Claude's [installation guide](https://code.claude.com/docs/en/discover-plugins) documents marketplace installation and the in-session shortcut. Its [plugin reference](https://code.claude.com/docs/en/plugins-reference#user-configuration) covers options and sensitive storage. The experimental Function Hooks launch requirement was verified against the installed 2.1.280 CLI.

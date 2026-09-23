@@ -7,7 +7,7 @@ function setup(){
  process:{run:async(argv:string[],init:any)=>{processes++;expect(argv).toContain('--safe-mode');expect(init.stdin).not.toContain('"type":"user"');return{exitCode:0,stdout:JSON.stringify({type:'control_response',response:{subtype:'success',request_id:'jevshift-catalog',response:{models:[{resolvedModel:'claude-opus-5[1m]',supportedEffortLevels:['low']}]}}})}}},
  command:{register:async(x:any)=>{commands.push(x)}},turn:{abort:async()=>{aborts++}},ui:{log:()=>{},status:()=>{}},clock:{now:async()=>0,after:()=>({cancel:()=>{}})},http:{fetch:async()=>{fetches++;throw Error('Must not fetch')}},env:{get:async()=>undefined}};
  const start=async()=>{await hooks['classic.SessionStart']($,{source:'startup'},async()=>({}));await hooks['session.start']($,{},async()=>({}))};
- const command=(args:string)=>hooks['command.run']($,{args});
+ const command=(args:string)=>hooks['command.run']($,{command:'jevshift',args});
  const step=(next:any)=>hooks['turn.step']($,{turnId:'t',index:0,model:'claude-sonnet-5',effort:'low'},next);
  return{hooks,$,store,commands,start,command,step,aborts:()=>aborts,fetches:()=>fetches,processes:()=>processes};
 }

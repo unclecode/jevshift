@@ -1,3 +1,4 @@
+import {effortAnswer} from './helpers/decision.ts';
 import {test,expect} from 'bun:test';
 import {SessionControls} from '../src/controls.ts';
 import {parseCatalog} from '../src/catalog.ts';
@@ -7,7 +8,7 @@ const snapshot={state:'<current_request>Design a system.</current_request>',meta
 function setup(store=new Map<string,unknown>(),enabled=true){
  let discoveries=0,calls=0;const c=new SessionControls(enabled);
  const host={get:async(k:string)=>store.get(k),set:async(k:string,v:unknown)=>{store.set(k,JSON.parse(JSON.stringify(v)))},discover:async()=>{discoveries++;return catalog}};
- const evaluator={now:async()=>0,after:()=>({cancel:()=>{}}),key:async()=> 'fake',show:()=>{},fetch:async()=>{calls++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}};
+ const evaluator={now:async()=>0,after:()=>({cancel:()=>{}}),key:async()=> 'fake',show:()=>{},fetch:async()=>{calls++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{effort_choice:effortAnswer('low'),model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}};
  return{c,host,evaluator,store,discoveries:()=>discoveries,calls:()=>calls};
 }
 test('pin/off never call evaluator; invalid inputs preserve accepted pin',async()=>{
@@ -38,7 +39,7 @@ test('failed pin persists block; explicit re-pin retries; effort and response mi
  const t=setup();await t.c.bind('a','startup',t.host);await t.c.command('pin opus',id.nativeModel);await (await t.c.guard(id))?.failed?.();expect((await t.c.guard(id))?.block).toBeTruthy();
  const r=setup(t.store);await r.c.bind('a','resume',r.host);expect((await r.c.guard(id))?.block).toBeTruthy();
  await t.c.command('pin opus',id.nativeModel);expect((await t.c.guard(id))?.block).toBeUndefined();await (await t.c.guard(id))?.completed?.('claude-sonnet-5');expect(t.c.blocked).toBe(true);
- await t.c.command('pin opus',id.nativeModel);expect((await t.c.guard({...id,effort:'max'}))?.block).toBeTruthy();
+ await t.c.command('pin opus',id.nativeModel);expect(await t.c.guard({...id,effort:'max'})).toMatchObject({model:id.nativeModel,effort:'max'});expect(t.c.mode).toBe('off');
 });
 test('auto gated by default; enabled auto and restored auto discover before selection',async()=>{
  const no=setup(undefined,false);await no.c.bind('a','startup',no.host);await no.c.command('auto',id.nativeModel);expect(no.c.mode).toBe('observe');expect(no.discoveries()).toBe(0);
@@ -62,7 +63,7 @@ test('slow discovery cannot undo off; persistence failure is visible',async()=>{
 });
 test('catalog admits only discovered Claude tiers at verified effort, never account data',()=>{
  const r={type:'control_response',response:{subtype:'success',request_id:'jevshift-catalog',response:{account:{email:'not retained'},models:[{resolvedModel:catalog.opus.model,supportedEffortLevels:['low','max']},{resolvedModel:catalog.sonnet.model,supportedEffortLevels:['low']},{resolvedModel:catalog.fable.model,supportedEffortLevels:['high']}]}}};
- expect(parseCatalog(JSON.stringify(r))).toEqual({opus:catalog.opus,sonnet:catalog.sonnet});for(const s of ['{}','bad',JSON.stringify({...r,response:{...r.response,subtype:'error'}})])expect(()=>parseCatalog(s)).toThrow();
+ expect(parseCatalog(JSON.stringify(r))).toEqual({opus:{...catalog.opus,efforts:['low','max']},sonnet:catalog.sonnet,fable:{...catalog.fable,efforts:['high']}});for(const s of ['{}','bad',JSON.stringify({...r,response:{...r.response,subtype:'error'}})])expect(()=>parseCatalog(s)).toThrow();
 });
 test('old response cannot overwrite new session status or trigger a cross-session evaluation',async()=>{
  const t=setup();await t.c.bind('a','startup',t.host);await t.c.command('pin opus',id.nativeModel);const selection=await t.c.guard(id);

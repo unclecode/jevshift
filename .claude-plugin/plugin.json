@@ -1,7 +1,7 @@
 {
   "name": "jevshift",
-  "version": "0.1.0-alpha.2",
-  "description": "Experimental Jev-assisted model selection for Claude Code: observe, pin, off, and opt-in auto.",
+  "version": "0.1.0-alpha.3",
+  "description": "Experimental Jev-assisted model and effort selection for Claude Code: observe, pin, off, and opt-in auto.",
   "keywords": [
     "claude-code",
     "model-selection",
@@ -12,7 +12,7 @@
     "openrouter_api_key": {
       "type": "string",
       "title": "OpenRouter API key",
-      "description": "Observe and auto send bounded, best-effort redacted conversation excerpts to OpenRouter / TypeSafe Jev. Claude Code manages sensitive storage; leave blank to use pin/off without Jev.",
+      "description": "Observe, auto and pinned models with automatic effort send bounded, best-effort redacted conversation excerpts to OpenRouter / TypeSafe Jev. Claude Code manages sensitive storage; leave blank to use manual pins/off without Jev.",
       "sensitive": true,
       "required": false
     },
@@ -35,6 +35,13 @@
       "title": "Claude executable for model discovery",
       "description": "Claude executable on PATH, or its absolute path. Runs a bounded no-prompt SDK initialization in safe mode.",
       "default": "claude",
+      "required": false
+    },
+    "max_effort": {
+      "type": "string",
+      "title": "Highest JevShift effort",
+      "description": "Highest effort JevShift may select: low, medium, high, xhigh or max. Native settings remain under Claude Code control.",
+      "default": "max",
       "required": false
     }
   },

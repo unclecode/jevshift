@@ -1,3 +1,4 @@
+import {effortAnswer} from './helpers/decision.ts';
 import {fakeCurl} from './helpers/fake-curl.ts';
 import {test,expect} from 'bun:test';
 import {registerObserveHooks} from '../src/observe-hooks.ts';
@@ -5,7 +6,7 @@ test('full observe adapter leaves event, stream and terminal result unchanged ex
  const hooks:Record<string,Function>={},logs:string[]=[],messages:any[]=[];let fetches=0,envReads=0,continuations=0;
  registerObserveHooks(((n:string,fn:Function)=>hooks[n]=fn) as any,{use_environment_key:true});
  const $={session:{id:async()=> 'a',messages:async()=>messages},clock:{now:async()=>0,after:()=>({cancel:()=>{}})},
-  env:{get:async(name:string)=>{if(name==='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC')return undefined;envReads++;return 'synthetic-test-key'}},ui:{status:()=>{},log:(s:string)=>logs.push(s)},http:{fetch:async()=>{fetches++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}}};
+  env:{get:async(name:string)=>{if(name==='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC')return undefined;envReads++;return 'synthetic-test-key'}},ui:{status:()=>{},log:(s:string)=>logs.push(s)},http:{fetch:async()=>{fetches++;return{ok:true,status:200,text:JSON.stringify({model:'typesafe/jev-1.13',answers:{effort_choice:effortAnswer('low'),model_choice:{type:'choice',choice:'fable',confidence:1,probabilities:{sonnet:0,opus:0,fable:1}}}})}}}};
  Object.assign($,{process:{run:fakeCurl($.http.fetch)}});
  await hooks['prompt.submit']($,{text:'Design the new architecture.',origin:{kind:'sdk'},wait:false},async(e:any)=>{messages.push({role:'user',text:e.text,toolUses:[]});return e});
  await hooks['turn.start']($,{text:'Design the new architecture.',turnId:'t'},async()=>({}));
@@ -15,7 +16,7 @@ test('full observe adapter leaves event, stream and terminal result unchanged ex
  const stream=hooks['turn.step']($,event,next),got=[];let final;
  while(true){const n=await stream.next();if(n.done){final=n.value;break}got.push(n.value)}
  expect(got).toEqual(chunks);expect(final).toBe(result);expect(continuations).toBe(1);expect(fetches).toBe(1);expect(envReads).toBe(1);
- expect(logs.some(s=>s.includes('recommend Fable; keeping claude-sonnet-5'))).toBe(true);
+ expect(logs.some(s=>s.includes('recommend Fable / low; keeping claude-sonnet-5'))).toBe(true);
 });
 test('key environment is opt-in and a configured sensitive option takes precedence',async()=>{
  for(const options of [{},{openrouter_api_key:'synthetic-option-key',use_environment_key:true}]){

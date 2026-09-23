@@ -1,5 +1,6 @@
 import type {Catalog,Target} from './auto.ts';
 import type {Tier} from './jev.ts';
+import {EFFORTS} from './effort.ts';
 export const TIERS:readonly Tier[]=['sonnet','opus','fable'];
 export const modelId=(x:unknown):x is string=>typeof x==='string'&&/^claude-[a-z0-9-]{1,100}(?:\[1m\])?$/.test(x);
 export function parseCatalog(stdout:string):Catalog {
@@ -15,9 +16,10 @@ export function parseCatalog(stdout:string):Catalog {
     // Prefer the plain context variant where the native menu offers it.
     const chosen=entries.find(x=>!x.resolvedModel.includes('[1m]'))??entries[0];
     if(!chosen)continue;
-    if(!Array.isArray(chosen.supportedEffortLevels)||!chosen.supportedEffortLevels.includes('low'))continue;
-    // Only low effort has real cross-model evidence in this lab. Expand after verification.
-    catalog[tier]={model:chosen.resolvedModel,efforts:['low']};
+    if(!Array.isArray(chosen.supportedEffortLevels))continue;
+    const efforts=EFFORTS.filter(e=>chosen.supportedEffortLevels.includes(e));
+    if(!efforts.length)continue;
+    catalog[tier]={model:chosen.resolvedModel,efforts};
   }
   if(!Object.keys(catalog).length)throw Error('No supported model tiers');
   return catalog;

@@ -1,8 +1,8 @@
 {
   "name": "jevshift",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "private": true,
-  "description": "Experimental Jev-assisted model selection for Claude Code: observe, pin, off, and opt-in auto.",
+  "description": "Experimental Jev-assisted model and effort selection for Claude Code: observe, pin, off, and opt-in auto.",
   "license": "MIT",
   "type": "module",
   "scripts": {
